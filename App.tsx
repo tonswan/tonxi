@@ -8,12 +8,37 @@ import { MOCK_ASSETS, MOCK_CHART_DATA, MOCK_HISTORY } from './constants';
 import { analyzeAsset } from './services/geminiService';
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<Tab>(Tab.MARKET);
+  // Initialize tab from URL hash if available
+  const [activeTab, setActiveTab] = useState<Tab>(() => {
+    const hash = window.location.hash.replace('#', '').toUpperCase();
+    return Object.values(Tab).includes(hash as Tab) ? (hash as Tab) : Tab.MARKET;
+  });
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [walletConnected, setWalletConnected] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<Asset>(MOCK_ASSETS[0]);
   const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
+
+  // Sync URL hash when activeTab changes
+  useEffect(() => {
+    const hash = activeTab.toLowerCase();
+    if (window.location.hash.replace('#', '') !== hash) {
+      window.location.hash = hash;
+    }
+  }, [activeTab]);
+
+  // Listen for hash changes (e.g. back button)
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '').toUpperCase();
+      if (Object.values(Tab).includes(hash as Tab)) {
+        setActiveTab(hash as Tab);
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   const handleConnectWallet = () => {
     setWalletConnected(!walletConnected);
