@@ -19,12 +19,13 @@ const App: React.FC = () => {
   const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
 
-  // Sync URL hash when activeTab changes
+  // Sync URL hash when activeTab changes and scroll to top
   useEffect(() => {
     const hash = activeTab.toLowerCase();
     if (window.location.hash.replace('#', '') !== hash) {
       window.location.hash = hash;
     }
+    window.scrollTo(0, 0);
   }, [activeTab]);
 
   // Listen for hash changes (e.g. back button)
